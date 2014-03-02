@@ -9,7 +9,7 @@
     tools:context=".MainActivity" >
     
      <fragment
-         android:id="@+id/mainfragment"
+         android:id="@+id/list"
          android:name="com.example.server.MainFragment"
          android:layout_width="fill_parent"
          android:layout_height="fill_parent"

@@ -8,17 +8,23 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 
 
 public class MainActivity extends FragmentActivity implements AsyncResponse{
 	private static String TAG = "MainActivity";
-	
+	public Tofragment del;
 	List<Data> m_dat = new ArrayList();
 	DownloadUsers us = new DownloadUsers();
+	public ArrayList<String> str =new ArrayList();
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,7 @@ public class MainActivity extends FragmentActivity implements AsyncResponse{
 		        } else {
 		           Log.i(TAG,"Fail");
 		        }
+
 	}
 
 	@Override
@@ -46,7 +53,7 @@ public class MainActivity extends FragmentActivity implements AsyncResponse{
 
 	@Override
 	public void processFinish(List<Data> output) {
-		ArrayList<String> str =new ArrayList();
+		
 		Log.i(TAG,"Received");
 		m_dat = output;
 		for(int i=0;i<m_dat.size();i++)
@@ -58,14 +65,8 @@ public class MainActivity extends FragmentActivity implements AsyncResponse{
 	    	System.out.println(str.get(i));
 	    }
 		
-		//Bundle b = new Bundle();
-	//	b.putStringArrayList("name", str);
-	//	MainFragment frag =new MainFragment();
-//		frag.setArguments(b);
-		//System.out.println(str.get(0));
-		
 	}
 	
-	 
 
+	
 }
