@@ -17,17 +17,19 @@ import android.util.Log;
 import android.view.Menu;
 
 
-public class MainActivity extends Activity implements AsyncResponse,OnUserSelectedListener{
+public class MainActivity extends Activity implements AsyncResponse,OnUserSelectedListener,testinterface{
 	private static String TAG = "MainActivity";
 	List<Data> m_dat = new ArrayList();
+	String s_id;
 	DownloadUsers us = new DownloadUsers();
 	public ArrayList<String> str =new ArrayList();
-
+	 public PhotolistFragment photofragment;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
 		
+		 
+	    photofragment = new PhotolistFragment();
 		if(savedInstanceState == null)
 		{
 		FragmentManager fragments = getFragmentManager(); 
@@ -35,9 +37,10 @@ public class MainActivity extends Activity implements AsyncResponse,OnUserSelect
 		fragments.beginTransaction();
 		 fragments.enableDebugLogging(true);
 		 MainFragment fragment = new MainFragment();
-		 fragmentTransaction.add(R.id.main,fragment,"Fragment");
+		 fragmentTransaction.add(R.id.mainactivity,fragment,"MainFragment");
 		// fragmentTransaction.addToBackStack("Fragment");
 		 fragmentTransaction.commit();
+		 setContentView(R.layout.activity_main);
 		}
 		us.delegate = this;
 		 ConnectivityManager connMgr = (ConnectivityManager) 
@@ -71,7 +74,7 @@ public class MainActivity extends Activity implements AsyncResponse,OnUserSelect
 	    }
 		
 		MainFragment Frag = (MainFragment)
-                getFragmentManager().findFragmentById(R.id.main);
+                getFragmentManager().findFragmentByTag("MainFragment");
 		Frag.receiveupdate(str);
 		
 		
@@ -82,16 +85,37 @@ public class MainActivity extends Activity implements AsyncResponse,OnUserSelect
 		
 	 int id = m_dat.get(pos).id;
 	 Bundle b = new Bundle();
-	 String s_id = Integer.toString(id);
+	  s_id = Integer.toString(id);
 	 Log.i(TAG,s_id);
 	
 	 FragmentManager fragments = getFragmentManager(); 
+	 fragments.enableDebugLogging(true);
 	 FragmentTransaction fragmentTransaction = 
 	fragments.beginTransaction();
-	 PhotolistFragment fragment = new PhotolistFragment();
-	 fragmentTransaction.replace(R.id.main, fragment,"optional");
+	 fragmentTransaction.replace(R.id.mainactivity, photofragment,"Photo");
 	 fragmentTransaction.addToBackStack("Optional");
 	 fragmentTransaction.commit();
+	
+	
+	 
+	    
+	}
+	
+	public void updatetext(String str)
+	{
+		 PhotolistFragment pFrag = (PhotolistFragment)
+	             getFragmentManager().findFragmentByTag("Photo");
+		 if(pFrag != null)
+			{
+				System.out.println("Something is wrong");
+			}
+		 pFrag.updatetext(str);
+	}
+
+	@Override
+	public void update() {
+		
+		updatetext(s_id);
 	}
 	
 

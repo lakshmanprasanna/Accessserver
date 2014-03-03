@@ -8,30 +8,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.os.AsyncTask;
-import android.os.Message;
 import android.util.JsonReader;
 import android.util.Log;
 
-public class DownloadUsers extends AsyncTask<String, Void, List<Data>>{
-
-	private static final String DEBUG_TAG = "Network";
-	public AsyncResponse delegate=null;
-    Jsonparser json = new Jsonparser();
-	@Override
-	protected List doInBackground(String... params) {
-		// TODO Auto-generated method stub
-		try {
-			  return json.downloadUsers(params[0]);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-		   e.printStackTrace();
-		   return null;
-		}
-		
-	}
+public class Jsonparser {
+	public String DEBUG_TAG = "JSON";
 	
-/*	private List<Data> downloadUsers(String myurl) throws IOException
+	public List<Data> downloadUsers(String myurl) throws IOException
 	{
 		
 		InputStream is = null;
@@ -39,8 +22,8 @@ public class DownloadUsers extends AsyncTask<String, Void, List<Data>>{
 		try {
 	        URL url = new URL(myurl);
 	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-	        conn.setReadTimeout(10000); //milliseconds 
-	        conn.setConnectTimeout(15000); // milliseconds 
+	        conn.setReadTimeout(10000 /* milliseconds */);
+	        conn.setConnectTimeout(15000 /* milliseconds */);
 	        conn.setRequestMethod("GET");
 	        conn.setDoInput(true);
 	        // Starts the query
@@ -102,14 +85,6 @@ public class DownloadUsers extends AsyncTask<String, Void, List<Data>>{
 	     reader.endObject();
 	     Data dat = new Data(id,user);
 	     return dat;
-	   }*/
-	 
-	 @Override
-     protected void onPostExecute(List<Data> result) {
-        
-        Log.i(DEBUG_TAG,"sent");
-	    delegate.processFinish(result);
-    }
-	 
-	}
+	   }
 
+}
