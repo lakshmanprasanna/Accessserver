@@ -65,6 +65,20 @@ public class MainActivity extends FragmentActivity implements AsyncResponse{
 	    	System.out.println(str.get(i));
 	    }
 		
+		
+		MainFragment Frag = (MainFragment)
+                getSupportFragmentManager().findFragmentById(R.id.mainfragment);
+		Frag.receiveupdate(str);
+		
+		/*Bundle b = new Bundle();
+		b.putString("name", "lakshman");
+		FragmentManager fragments = getSupportFragmentManager(); 
+		 FragmentTransaction fragmentTransaction = 
+		fragments.beginTransaction();
+		 MainFragment fragment = new MainFragment();
+		 fragmentTransaction.add(R.id.mainfragment, fragment);
+		 fragmentTransaction.commit();*/
+		
 	}
 	
 
