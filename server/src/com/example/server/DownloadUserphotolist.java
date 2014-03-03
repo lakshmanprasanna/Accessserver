@@ -9,14 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.os.AsyncTask;
-import android.os.Message;
 import android.util.JsonReader;
 import android.util.Log;
 
-public class DownloadUsers extends AsyncTask<String, Void, List<Data>>{
+public class DownloadUserphotolist extends AsyncTask<String, Void, List<Data>> {
 
 	private static final String DEBUG_TAG = "Network";
-	public AsyncResponse delegate=null;
+	public AsyncResponsetwo delegate=null;
     Jsonparser json = new Jsonparser();
 	@Override
 	protected List doInBackground(String... params) {
@@ -34,9 +33,24 @@ public class DownloadUsers extends AsyncTask<String, Void, List<Data>>{
 	 @Override
      protected void onPostExecute(List<Data> result) {
         
-        Log.i(DEBUG_TAG,"sent");
-	    delegate.processFinish(result);
+       if(result == null)
+       {
+    	   Log.i(DEBUG_TAG,"NULLLLLLL");
+       }
+       else
+       {
+    	   ArrayList<String> str1 = new ArrayList(); 
+   		for(int i=0;i<result.size();i++)
+   	    {
+   	    	str1.add(result.get(i).user);
+   	    }
+   		for(int i=0;i<str1.size();i++)
+   	    {
+   	    	//System.out.println(str1.get(i));
+   	    }
+   		
+   		delegate.processFinishtwo(result);
+       }
     }
 	 
-	}
-
+}

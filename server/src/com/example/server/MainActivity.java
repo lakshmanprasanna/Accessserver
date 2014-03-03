@@ -15,15 +15,13 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.Toast;
 
 
-public class MainActivity extends Activity implements AsyncResponse,OnUserSelectedListener,testinterface{
+public class MainActivity extends Activity implements OnUserSelectedListener,testinterface{
 	private static String TAG = "MainActivity";
-	List<Data> m_dat = new ArrayList();
 	String s_id;
-	DownloadUsers us = new DownloadUsers();
-	public ArrayList<String> str =new ArrayList();
-	 public PhotolistFragment photofragment;
+    public PhotolistFragment photofragment;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -42,17 +40,6 @@ public class MainActivity extends Activity implements AsyncResponse,OnUserSelect
 		 fragmentTransaction.commit();
 		 setContentView(R.layout.activity_main);
 		}
-		us.delegate = this;
-		 ConnectivityManager connMgr = (ConnectivityManager) 
-		            getSystemService(Context.CONNECTIVITY_SERVICE);
-		        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		        if (networkInfo != null && networkInfo.isConnected()) {
-		        	
-		        	us.execute("http://bismarck.sdsu.edu/photoserver/userlist");
-		            Log.i(TAG,"success");
-		        } else {
-		           Log.i(TAG,"Fail");
-		        }
 
 	}
 
@@ -63,30 +50,13 @@ public class MainActivity extends Activity implements AsyncResponse,OnUserSelect
 		return true;
 	}
 
-	@Override
-	public void processFinish(List<Data> output) {
-		
-		Log.i(TAG,"Received");
-		m_dat = output;
-		for(int i=0;i<m_dat.size();i++)
-	    {
-	    	str.add(m_dat.get(i).user);
-	    }
-		
-		MainFragment Frag = (MainFragment)
-                getFragmentManager().findFragmentByTag("MainFragment");
-		Frag.receiveupdate(str);
-		
-		
-	}
+	
 
 	@Override
-	public void notify(int pos) {
+	public void notify(String ss_id) {
 		
-	 int id = m_dat.get(pos).id;
-	 Bundle b = new Bundle();
-	  s_id = Integer.toString(id);
-	 Log.i(TAG,s_id);
+	 
+    s_id =ss_id;
 	
 	 FragmentManager fragments = getFragmentManager(); 
 	 fragments.enableDebugLogging(true);
@@ -96,12 +66,11 @@ public class MainActivity extends Activity implements AsyncResponse,OnUserSelect
 	 fragmentTransaction.addToBackStack("Optional");
 	 fragmentTransaction.commit();
 	
-	
 	 
 	    
 	}
 	
-	public void updatetext(String str)
+	public void updatetext(String s)
 	{
 		 PhotolistFragment pFrag = (PhotolistFragment)
 	             getFragmentManager().findFragmentByTag("Photo");
@@ -109,14 +78,12 @@ public class MainActivity extends Activity implements AsyncResponse,OnUserSelect
 			{
 				System.out.println("Something is wrong");
 			}
-		 pFrag.updatetext(str);
+		 pFrag.updatetext(s);
 	}
 
 	@Override
 	public void update() {
-		
 		updatetext(s_id);
 	}
-	
 
 }

@@ -6,6 +6,9 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainFragment extends Fragment{
+public class MainFragment extends Fragment implements AsyncResponse{
 	  MainActivity main;
 	List<Data> dat = new ArrayList();
 	ArrayList<String> str = new ArrayList();
@@ -58,6 +61,23 @@ public class MainFragment extends Fragment{
         updatelist(str);
         Log.i("Fragment","SavedState called first ");
     }
+    
+   // item = (OnUserSelectedListener) getActivity();
+	// item.updateone();
+    
+    
+    ConnectivityManager connMgr = (ConnectivityManager) 
+            getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+        	DownloadUsers us = new DownloadUsers();
+        	us.delegate=this;
+        	us.execute("http://bismarck.sdsu.edu/photoserver/userlist");
+            Log.i("MainFragment","success");
+        } else {
+           Log.i("MainFragment","Fail");
+        }
+	 
 	}
 	 
 	 public void receiveupdate(ArrayList<String> m_dat)
@@ -91,12 +111,13 @@ public class MainFragment extends Fragment{
 	        super.onDestroyView();
 	       
 	        savedState = SaveState(); /* vstup defined here for sure */
+	        str.clear();
 	    }
 	 
-	 public void updatelist(ArrayList<String> str)
+	 public void updatelist(ArrayList<String> str1)
 	 {
 		 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-			        android.R.layout.simple_list_item_1, str);
+			        android.R.layout.simple_list_item_1, str1);
 		 list.setAdapter(adapter);
 		 
 		 list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -105,14 +126,33 @@ public class MainFragment extends Fragment{
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
 				 
-				String pos = Integer.toString(position);
-				Toast.makeText(getActivity(), pos, Toast.LENGTH_SHORT);
-				Log.i("Adapter",pos);
-				item.notify(position);
+				int id = dat.get(position).id;
+				String s_id = Integer.toString(id);
+				Log.i("Adapter",s_id);
+				item.notify(s_id);
 				
 			}
 			 
 		});
 	 }
+
+	@Override
+	public void processFinish(List<Data> output) {
+		
+		dat = output;
+		
+		Log.i("MainFragment","Received");
+		for(int i=0;i<output.size();i++)
+	    {
+	    	str.add(output.get(i).user);
+	    }
+		for(int i=0;i<str.size();i++)
+   	    {
+   	    	System.out.println(str.get(i));
+   	    }
+		
+		updatelist(str);
+		
+	}
 }
 
