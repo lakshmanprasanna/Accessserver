@@ -9,27 +9,36 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 
 
-public class MainActivity extends FragmentActivity implements AsyncResponse{
+public class MainActivity extends Activity implements AsyncResponse,OnUserSelectedListener{
 	private static String TAG = "MainActivity";
-	public Tofragment del;
 	List<Data> m_dat = new ArrayList();
 	DownloadUsers us = new DownloadUsers();
 	public ArrayList<String> str =new ArrayList();
-	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		if(savedInstanceState == null)
+		{
+		FragmentManager fragments = getFragmentManager(); 
+		 FragmentTransaction fragmentTransaction = 
+		fragments.beginTransaction();
+		 fragments.enableDebugLogging(true);
+		 MainFragment fragment = new MainFragment();
+		 fragmentTransaction.add(R.id.main,fragment,"Fragment");
+		// fragmentTransaction.addToBackStack("Fragment");
+		 fragmentTransaction.commit();
+		}
 		us.delegate = this;
 		 ConnectivityManager connMgr = (ConnectivityManager) 
 		            getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -60,27 +69,30 @@ public class MainActivity extends FragmentActivity implements AsyncResponse{
 	    {
 	    	str.add(m_dat.get(i).user);
 	    }
-		for(int i=0;i<str.size();i++)
-	    {
-	    	System.out.println(str.get(i));
-	    }
-		
 		
 		MainFragment Frag = (MainFragment)
-                getSupportFragmentManager().findFragmentById(R.id.mainfragment);
+                getFragmentManager().findFragmentById(R.id.main);
 		Frag.receiveupdate(str);
 		
-		/*Bundle b = new Bundle();
-		b.putString("name", "lakshman");
-		FragmentManager fragments = getSupportFragmentManager(); 
-		 FragmentTransaction fragmentTransaction = 
-		fragments.beginTransaction();
-		 MainFragment fragment = new MainFragment();
-		 fragmentTransaction.add(R.id.mainfragment, fragment);
-		 fragmentTransaction.commit();*/
 		
+	}
+
+	@Override
+	public void notify(int pos) {
+		
+	 int id = m_dat.get(pos).id;
+	 Bundle b = new Bundle();
+	 String s_id = Integer.toString(id);
+	 Log.i(TAG,s_id);
+	
+	 FragmentManager fragments = getFragmentManager(); 
+	 FragmentTransaction fragmentTransaction = 
+	fragments.beginTransaction();
+	 PhotolistFragment fragment = new PhotolistFragment();
+	 fragmentTransaction.replace(R.id.main, fragment,"optional");
+	 fragmentTransaction.addToBackStack("Optional");
+	 fragmentTransaction.commit();
 	}
 	
 
-	
 }

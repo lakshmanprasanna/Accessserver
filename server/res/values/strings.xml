@@ -4,5 +4,9 @@
     <string name="app_name">server</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string-array name="example">
+        <item >ram</item>
+        <item >lakshman</item>
+    </string-array>
 
 </resources>
