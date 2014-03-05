@@ -18,16 +18,17 @@ import android.view.Menu;
 import android.widget.Toast;
 
 
-public class MainActivity extends Activity implements OnUserSelectedListener,testinterface{
+public class MainActivity extends Activity implements OnUserSelectedListener,testinterface,Imageinterface{
 	private static String TAG = "MainActivity";
-	String s_id;
+	String s_id,im_id;
     public PhotolistFragment photofragment;
+    public Imagefragment image;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		 
+		 setContentView(R.layout.activity_main);
 	    photofragment = new PhotolistFragment();
+	    image = new Imagefragment();
 		if(savedInstanceState == null)
 		{
 		FragmentManager fragments = getFragmentManager(); 
@@ -38,7 +39,7 @@ public class MainActivity extends Activity implements OnUserSelectedListener,tes
 		 fragmentTransaction.add(R.id.mainactivity,fragment,"MainFragment");
 		// fragmentTransaction.addToBackStack("Fragment");
 		 fragmentTransaction.commit();
-		 setContentView(R.layout.activity_main);
+		
 		}
 
 	}
@@ -74,16 +75,57 @@ public class MainActivity extends Activity implements OnUserSelectedListener,tes
 	{
 		 PhotolistFragment pFrag = (PhotolistFragment)
 	             getFragmentManager().findFragmentByTag("Photo");
-		 if(pFrag != null)
-			{
-				System.out.println("Something is wrong");
-			}
-		 pFrag.updatetext(s);
+		 try{
+			 if(pFrag != null)
+				{
+				 pFrag.updatetext(s);
+				}
+		 }
+		 catch(Exception e)
+		 {
+			 
+		 }
+		 
+		
 	}
 
 	@Override
 	public void update() {
 		updatetext(s_id);
 	}
+
+	@Override
+	public void notifyuserphotolist(String s_id) {
+		
+		im_id = s_id;
+		FragmentManager fragments = getFragmentManager(); 
+		 fragments.enableDebugLogging(true);
+		 FragmentTransaction fragmentTransaction = 
+		fragments.beginTransaction();
+		 fragmentTransaction.replace(R.id.mainactivity, image,"image");
+		 fragmentTransaction.addToBackStack("image");
+		 fragmentTransaction.commit();
+		
+	}
+
+	@Override
+	public void update_image() {
+		
+		 Imagefragment imFrag = (Imagefragment)
+	             getFragmentManager().findFragmentByTag("image");
+		 try{
+			 if(imFrag != null)
+				{
+				 imFrag.update_text(im_id);
+				}
+		 }
+		 catch(Exception e)
+		 {
+			 
+		 }
+		 
+		
+	}
+
 
 }

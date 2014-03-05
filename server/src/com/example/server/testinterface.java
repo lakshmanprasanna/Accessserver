@@ -2,5 +2,6 @@ package com.example.server;
 
 public interface testinterface {
 	
-	void update();
+	public void update();
+	public void notifyuserphotolist(String s_id);
 }

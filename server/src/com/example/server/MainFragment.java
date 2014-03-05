@@ -10,6 +10,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ public class MainFragment extends Fragment implements AsyncResponse{
 	  MainActivity main;
 	List<Data> dat = new ArrayList();
 	ArrayList<String> str = new ArrayList();
+	ArrayList<Integer> int_l = new ArrayList();
 	public ArrayAdapter<String> adapter;
 	ListView list;
 	public OnUserSelectedListener item;
@@ -47,25 +49,28 @@ public class MainFragment extends Fragment implements AsyncResponse{
     }
 	
 	@Override
-	  public void onActivityCreated(Bundle savedInstanceState) {
-	    super.onActivityCreated(savedInstanceState);
+	  public void onActivityCreated(Bundle b) {
+	    super.onActivityCreated(b);
        
-	 if(savedInstanceState != null && savedState == null)
-	 {
-        savedState = savedInstanceState.getBundle("list");
-        Log.i("Fragment","SavedInstanceState called first ");
-	 }
-    if(savedState != null)
+	 
+    if(savedState == null && b != null )
     {
+    	 Bundle d = b.getBundle("key");
+    	 savedState = d;
+    	 Log.i("Fragment","hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh ");
+    }
+    if(savedState!=null)
+    {
+    	
+    
         str = savedState.getStringArrayList("list");
+        int_l = savedState.getIntegerArrayList("id");
         updatelist(str);
-        Log.i("Fragment","SavedState called first ");
+        Log.i("Fragment","working");
     }
     
-   // item = (OnUserSelectedListener) getActivity();
-	// item.updateone();
-    
-    
+    if(savedState == null && b == null)
+    {
     ConnectivityManager connMgr = (ConnectivityManager) 
             getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -77,42 +82,40 @@ public class MainFragment extends Fragment implements AsyncResponse{
         } else {
            Log.i("MainFragment","Fail");
         }
-	 
+    }
 	}
 	 
-	 public void receiveupdate(ArrayList<String> m_dat)
-	 {
-		 
-		 str = m_dat;
-		 updatelist(str);
-   }
 	 
-	 @Override
-	    public void onSaveInstanceState(Bundle icicle) {
-	        super.onSaveInstanceState(icicle);
-	        
-	        Log.i("Fragment","SavedInstanceState called");
-	        
-	        icicle.putBundle("list", savedState != null ? savedState : SaveState());
-	       
-	      }
 	
 	 public Bundle SaveState() {
 	        
-		    Bundle b = new Bundle();
+		    
 	        Log.i("Fragment","savetate called");
-	        
-	        b.putStringArrayList("list", str);
-	        return b;
+	        savedState = new Bundle();
+	        savedState.putStringArrayList("list", str);
+	        savedState.putIntegerArrayList("id", int_l);
+	        return savedState;
 	       
 	      }
 	 @Override
 	    public void onDestroyView() {
 	        super.onDestroyView();
 	       
-	        savedState = SaveState(); /* vstup defined here for sure */
-	        str.clear();
+	      
+	       SaveState(); /* vstup defined here for sure */
+	      
 	    }
+	 
+	 @Override
+		public void onSaveInstanceState(Bundle b)
+		{
+			super.onSaveInstanceState(b);
+			
+			Bundle f = SaveState();
+			b.putBundle("key", f);
+		}
+	 
+	 
 	 
 	 public void updatelist(ArrayList<String> str1)
 	 {
@@ -126,7 +129,9 @@ public class MainFragment extends Fragment implements AsyncResponse{
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
 				 
-				int id = dat.get(position).id;
+				
+				System.out.println(position);
+				int id = int_l.get(position);
 				String s_id = Integer.toString(id);
 				Log.i("Adapter",s_id);
 				item.notify(s_id);
@@ -145,11 +150,10 @@ public class MainFragment extends Fragment implements AsyncResponse{
 		for(int i=0;i<output.size();i++)
 	    {
 	    	str.add(output.get(i).user);
+	    	int_l.add(output.get(i).id);
+	    	
 	    }
-		for(int i=0;i<str.size();i++)
-   	    {
-   	    	System.out.println(str.get(i));
-   	    }
+		
 		
 		updatelist(str);
 		

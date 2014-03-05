@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -25,6 +26,8 @@ public class PhotolistFragment extends Fragment implements AsyncResponsetwo{
 	public String s_id;
 	public ArrayList<String> str = new ArrayList();
 	public View resultView;
+	public List<Data> dat;
+	public Bundle g = null;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			 Bundle savedInstanceState) {
@@ -36,11 +39,24 @@ public class PhotolistFragment extends Fragment implements AsyncResponsetwo{
 			 }
 	
 	@Override
-	  public void onActivityCreated(Bundle savedInstanceState) {
-	    super.onActivityCreated(savedInstanceState);
+	  public void onActivityCreated(Bundle b) {
+	    super.onActivityCreated(b);
 
 	    test = (testinterface) getActivity();
 		 test.update();
+		 if(b!= null && g == null)
+		 {
+			 Bundle dd = b.getBundle("key");
+			 g = dd;
+			 Log.i("ffffffffffffffff","rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+		 }
+		 if(g!=null)
+		 {
+			 Log.i("ffffffffffffffff","eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+			 s_id = g.getString("key");
+			 
+			 System.out.println(s_id);
+		 }
 		 
 	    
 	}
@@ -72,19 +88,12 @@ public class PhotolistFragment extends Fragment implements AsyncResponsetwo{
 	
 		
 		s_id = str;
-   		/*for(int i=0;i<str.size();i++)
-   	    {
-   	    	System.out.println(str.get(i));
-   	    }
-   		
-
-		*/
 		
 	}
 
 	@Override
 	public void processFinishtwo(List<Data> output) {
-		
+		dat = output;
 		Log.i("PhotoFragment","Received");
 		for(int i=0;i<output.size();i++)
 	    {
@@ -98,6 +107,21 @@ public class PhotolistFragment extends Fragment implements AsyncResponsetwo{
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
 		        android.R.layout.simple_list_item_1, str);
 	 list.setAdapter(adapter);
+	 list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1,
+					int position, long arg3) {
+				 
+				int id = dat.get(position).id;
+				String s_id = Integer.toString(id);
+				Log.i("Adapter",s_id);
+				test.notifyuserphotolist(s_id);
+				Log.i("PhotoFragment","ID sent");
+			}
+			 
+		});
+	 
 		
 }
 	
@@ -105,7 +129,25 @@ public class PhotolistFragment extends Fragment implements AsyncResponsetwo{
 	    public void onDestroyView() {
 	        super.onDestroyView();
 	       str.clear();
+	       
+	     savestate();
 	      
 	    }
+	 
+	 @Override
+		public void onSaveInstanceState(Bundle b)
+		{
+			super.onSaveInstanceState(b);
+			
+			Bundle f = savestate();
+			b.putBundle("key", f);
+		}
+	 
+	 public Bundle savestate()
+	 {
+		 g = new Bundle();
+		 g.putString("key", s_id);
+		 return g;
+	 }
 	 
 }
