@@ -12,7 +12,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 public class Jsonparser {
-	public String DEBUG_TAG = "JSON";
+	private String DEBUG_TAG = "JSON";
 	
 	public List<Data> downloadUsers(String myurl) throws IOException
 	{

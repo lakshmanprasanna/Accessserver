@@ -10,14 +10,30 @@ import java.util.List;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
-public class Imagedownloader extends AsyncTask<String, Void, Bitmap> {
+public class Imagedownloader extends AsyncTask<String, Integer, Bitmap> {
 	
 	public AsyncResponse_image delegate=null;
+	//private ProgressBar pb;
+	private int progress;
+	
+	
+	
+	@Override
+	protected void onPreExecute() {
+       super.onPreExecute();
+	    progress = 0;
+	   // pb.setVisibility(View.VISIBLE);
+	    
+	}
 
 	@Override
 	protected Bitmap doInBackground(String... params) {
+		
 		
 	   try
 	   {
@@ -28,7 +44,17 @@ public class Imagedownloader extends AsyncTask<String, Void, Bitmap> {
 		   e.printStackTrace();
 		   return null;
 	   }
+	  
+	   
 	
+	}
+	
+	@Override
+	protected void onProgressUpdate(Integer... values) {
+
+	/*--- show download progress on main UI thread---*/
+//	    pb.setProgress(values[0]);
+	    super.onProgressUpdate(values);
 	}
 	
 	public Bitmap downloadBitmap(String myurl) throws IOException

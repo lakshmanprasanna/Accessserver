@@ -17,47 +17,53 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
-public class PhotolistFragment extends Fragment implements AsyncResponsetwo{
+public class PhotolistFragment extends Fragment{
 	public ListView list;
 	public testinterface test;
 	public MainActivity main;
 	public String s_id;
 	public ArrayList<String> str = new ArrayList();
 	public View resultView;
-	public List<Data> dat;
+	public ArrayList<Integer> in;
 	public Bundle g = null;
+	public ProgressBar pb;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			 Bundle savedInstanceState) {
 		
 		    Log.i("Photofragment","Creating new one");
 			  resultView = inflater.inflate(R.layout.plist_layout, container, false);
-			  list = (ListView) resultView.findViewById(R.id.listView1);		 
+			  list = (ListView) resultView.findViewById(R.id.listView1);
 			 return resultView;
 			 }
 	
 	@Override
 	  public void onActivityCreated(Bundle b) {
 	    super.onActivityCreated(b);
-
+	   
+	    if(b==null)
+	    {
+	    	 Log.i("PhotoFragment","yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
 	    test = (testinterface) getActivity();
 		 test.update();
-		 if(b!= null && g == null)
+		
+	    }
+	    else
 		 {
-			 Bundle dd = b.getBundle("key");
-			 g = dd;
-			 Log.i("ffffffffffffffff","rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+	    
+	    	 Log.i("PhotoFragment","zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+	    	 test = (testinterface) getActivity();
+	    	 
+			 str = b.getStringArrayList("str");
+			 in=b.getIntegerArrayList("int");
+			 if(str.size()>0)
+			 updatephotolist(str,in);
+			 Log.i("MainFragment","Retrive");
+			
 		 }
-		 if(g!=null)
-		 {
-			 Log.i("ffffffffffffffff","eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-			 s_id = g.getString("key");
-			 
-			 System.out.println(s_id);
-		 }
-		 
 	    
 	}
 	
@@ -66,46 +72,35 @@ public class PhotolistFragment extends Fragment implements AsyncResponsetwo{
 	{
 		super.onResume();
 		
-		 
-		 ConnectivityManager connMgr = (ConnectivityManager) 
-		           getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-		        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		        if (networkInfo != null && networkInfo.isConnected()) {
-		        	String url = "http://bismarck.sdsu.edu/photoserver/userphotos/" + s_id;
-		        	System.out.println(url);
-		        	DownloadUserphotolist usl = new DownloadUserphotolist();
-		        	usl.delegate=this;
-		        	usl.execute(url);
-		            Log.i("PhotoFragment","success");
-		        } else {
-		           Log.i("PhotoFragment","Fail");
-		        }
-	}
-	
-	public void updatetext(String str)
-	{
-		Log.i("LOL","LOLLLLLLLLLLLLLLLLLLLLLLLL");
-	
-		
-		s_id = str;
 		
 	}
+	
+	 @Override
+		public void onSaveInstanceState(Bundle b)
+		{
+			super.onSaveInstanceState(b);
+			
+			b.putStringArrayList("str", str);
+			b.putIntegerArrayList("int", in);
+			Log.i("MainFragment","save");
+		}
+	 
+	
 
-	@Override
-	public void processFinishtwo(List<Data> output) {
-		dat = output;
+	
+	public void updatephotolist(ArrayList<String> str1,ArrayList<Integer> int_l)
+	{
 		Log.i("PhotoFragment","Received");
-		for(int i=0;i<output.size();i++)
-	    {
-	    	str.add(output.get(i).user);
-	    }
-		for(int i=0;i<str.size();i++)
-   	    {
-   	    	System.out.println(str.get(i));
-   	    }
+		
+		
+		
+		System.out.println(str1.size());
+		System.out.println(int_l.size());
+		str = str1;
+		in = int_l;
 		
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-		        android.R.layout.simple_list_item_1, str);
+		        android.R.layout.simple_list_item_activated_1, str1);
 	 list.setAdapter(adapter);
 	 list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -113,41 +108,19 @@ public class PhotolistFragment extends Fragment implements AsyncResponsetwo{
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
 				 
-				int id = dat.get(position).id;
-				String s_id = Integer.toString(id);
-				Log.i("Adapter",s_id);
-				test.notifyuserphotolist(s_id);
+			//	int id = in.get(position);
+			//	String s_id = Integer.toString(id);
+				test.notifyuserphotolist(in,position);
 				Log.i("PhotoFragment","ID sent");
+				
 			}
 			 
 		});
-	 
-		
-}
+	}
 	
-	 @Override
-	    public void onDestroyView() {
-	        super.onDestroyView();
-	       str.clear();
-	       
-	     savestate();
-	      
-	    }
-	 
-	 @Override
-		public void onSaveInstanceState(Bundle b)
-		{
-			super.onSaveInstanceState(b);
-			
-			Bundle f = savestate();
-			b.putBundle("key", f);
-		}
-	 
-	 public Bundle savestate()
-	 {
-		 g = new Bundle();
-		 g.putString("key", s_id);
-		 return g;
-	 }
+	public void setposition(int pos)
+	{
+		list.setItemChecked(pos, true);
+	}
 	 
 }

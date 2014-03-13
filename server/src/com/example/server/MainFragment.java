@@ -18,17 +18,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
-public class MainFragment extends Fragment implements AsyncResponse{
+public class MainFragment extends Fragment{
 	  MainActivity main;
-	List<Data> dat = new ArrayList();
 	ArrayList<String> str = new ArrayList();
 	ArrayList<Integer> int_l = new ArrayList();
 	public ArrayAdapter<String> adapter;
 	ListView list;
 	public OnUserSelectedListener item;
 	public Bundle savedState;
+	public ProgressBar pb;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			 Bundle savedInstanceState) {
@@ -52,75 +53,35 @@ public class MainFragment extends Fragment implements AsyncResponse{
 	  public void onActivityCreated(Bundle b) {
 	    super.onActivityCreated(b);
        
-	 
-    if(savedState == null && b != null )
-    {
-    	 Bundle d = b.getBundle("key");
-    	 savedState = d;
-    	 Log.i("Fragment","hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh ");
-    }
-    if(savedState!=null)
-    {
-    	
-    
-        str = savedState.getStringArrayList("list");
-        int_l = savedState.getIntegerArrayList("id");
-        updatelist(str);
-        Log.i("Fragment","working");
-    }
-    
-    if(savedState == null && b == null)
-    {
-    ConnectivityManager connMgr = (ConnectivityManager) 
-            getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-        	DownloadUsers us = new DownloadUsers();
-        	us.delegate=this;
-        	us.execute("http://bismarck.sdsu.edu/photoserver/userlist");
-            Log.i("MainFragment","success");
-        } else {
-           Log.i("MainFragment","Fail");
-        }
-    }
+	 if(b!=null)
+	 {
+		 str = b.getStringArrayList("str");
+		 int_l=b.getIntegerArrayList("int");
+		 updatelist(str,int_l);
+		 Log.i("MainFragment","Retrive");
+	 }
+   
 	}
-	 
-	 
-	
-	 public Bundle SaveState() {
-	        
-		    
-	        Log.i("Fragment","savetate called");
-	        savedState = new Bundle();
-	        savedState.putStringArrayList("list", str);
-	        savedState.putIntegerArrayList("id", int_l);
-	        return savedState;
-	       
-	      }
-	 @Override
-	    public void onDestroyView() {
-	        super.onDestroyView();
-	       
-	      
-	       SaveState(); /* vstup defined here for sure */
-	      
-	    }
 	 
 	 @Override
 		public void onSaveInstanceState(Bundle b)
 		{
 			super.onSaveInstanceState(b);
 			
-			Bundle f = SaveState();
-			b.putBundle("key", f);
+			b.putStringArrayList("str", str);
+			b.putIntegerArrayList("int", int_l);
+			Log.i("MainFragment","save");
 		}
 	 
 	 
-	 
-	 public void updatelist(ArrayList<String> str1)
+	 public void updatelist(ArrayList<String> str1,ArrayList<Integer> in)
 	 {
+			
+		 str = str1;
+		 int_l=in;
+		 
 		 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-			        android.R.layout.simple_list_item_1, str1);
+			        android.R.layout.simple_list_item_activated_1, str);
 		 list.setAdapter(adapter);
 		 
 		 list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -140,23 +101,6 @@ public class MainFragment extends Fragment implements AsyncResponse{
 			 
 		});
 	 }
-
-	@Override
-	public void processFinish(List<Data> output) {
-		
-		dat = output;
-		
-		Log.i("MainFragment","Received");
-		for(int i=0;i<output.size();i++)
-	    {
-	    	str.add(output.get(i).user);
-	    	int_l.add(output.get(i).id);
-	    	
-	    }
-		
-		
-		updatelist(str);
 		
 	}
-}
 

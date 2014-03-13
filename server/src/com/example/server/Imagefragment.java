@@ -7,83 +7,100 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
-public class Imagefragment extends Fragment implements AsyncResponse_image {
+public class Imagefragment extends Fragment {
 	
-	public static String TAG = "IMAGEFRAGMENT";
-	public Imageinterface test;
-	public ImageView imview;
-	public String im_id;
+	private static String TAG = "IMAGEFRAGMENT";
+	private Imageinterface test;
+	private ImageView imview;
+	private Bitmap ima;
+	private View resultView;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			 Bundle savedInstanceState) {
 		
 		    Log.i(TAG,"Creating new view");
-			  View resultView = inflater.inflate(R.layout.image_layout, container, false);
+			  resultView = inflater.inflate(R.layout.image_layout, container, false);
 		//	  list = (ListView) resultView.findViewById(R.id.listView1);	
 			  imview = (ImageView) resultView.findViewById(R.id.imageView1);
-			 return resultView;
+			        return resultView;
 			 }
 	
 	@Override
 	  public void onActivityCreated(Bundle b) {
 	    super.onActivityCreated(b);
-
-	    test = (Imageinterface) getActivity();
+	     test = (Imageinterface) getActivity();
 		 test.update_image(); 
-		 if(b !=null)
-		 {
-			 String srr= b.getString("key");
-		     im_id = srr;
-		 }
+		 
+		 final GestureDetector gesture = new GestureDetector(getActivity(),
+		            new GestureDetector.SimpleOnGestureListener() {
+
+		                @Override
+		                public boolean onDown(MotionEvent e) {
+		                    return true;
+		                }
+
+		                @Override
+		                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+		                    float velocityY) {
+		                    Log.i("ffffffffffff", "onFling has been called!");
+		                    final int SWIPE_MIN_DISTANCE = 120;
+		                    final int SWIPE_MAX_OFF_PATH = 250;
+		                    final int SWIPE_THRESHOLD_VELOCITY = 200;
+		                    try {
+		                        if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+		                            return false;
+		                        if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+		                            && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+		                            Log.i("ddddddddddddd", "Right to Left");
+		                            
+		                            test.nextImage();
+		                            
+		                        } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+		                            && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+		                            Log.i("gggggggggggggggggggg", "Left to Right");
+		                            test.previousImage();
+		                            
+		                        }
+		                    } catch (Exception e) {
+		                        // nothing
+		                    }
+		                    return super.onFling(e1, e2, velocityX, velocityY);
+		                }
+		            });
+
+		        resultView.setOnTouchListener(new View.OnTouchListener() {
+		            @Override
+		            public boolean onTouch(View v, MotionEvent event) {
+		                return gesture.onTouchEvent(event);
+		            }
+		        });
 		 
 	}
 	
-	
-	@Override
-	public void onResume()
+	public void setImage(Bitmap image)
 	{
-		super.onResume();
-		
-		ConnectivityManager connMgr = (ConnectivityManager) 
-		           getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-		        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		        if (networkInfo != null && networkInfo.isConnected()) {
-		        	String url = "http://bismarck.sdsu.edu/photoserver/photo/" + im_id;
-		        	System.out.println(url);
-		        	Imagedownloader usl = new Imagedownloader();
-		        	usl.delegate=this;
-		        	usl.execute(url);
-		            Log.i(TAG,"success");
-		        } else {
-		           Log.i("ImageFragment","Fail");
-		        }
-		
-		
+		imview.setScaleType(ScaleType.CENTER_INSIDE);
+		imview.setImageBitmap(image);
+		ima = image;
 	}
 	
-	public void update_text(String s)
+	public void clearview()
 	{
-		im_id=s;
+		imview.setImageResource(-1);
+		
 	}
 
-	@Override
-	public void processFinish_image(Bitmap output) {
-		
-		imview.setImageBitmap(output);
-	}
 	
-	@Override
-	public void onSaveInstanceState(Bundle b)
-	{
-		super.onSaveInstanceState(b);
-		
-		b.putString("key", im_id);
-	}
-
+	
 }
