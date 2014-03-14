@@ -93,9 +93,7 @@ public class MainFragment extends Fragment{
 				
 				System.out.println(position);
 				int id = int_l.get(position);
-				String s_id = Integer.toString(id);
-				Log.i("Adapter",s_id);
-				item.notify(s_id);
+				item.notify(id);
 				
 			}
 			 

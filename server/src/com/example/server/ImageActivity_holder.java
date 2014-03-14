@@ -1,10 +1,17 @@
 package com.example.server;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -22,7 +29,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-public class ImageActivity_holder extends Activity implements Imageinterface,AsyncResponse_image {
+public class ImageActivity_holder extends Activity implements Imageinterface,AsyncResponse_image,imagereader_response{
 
 	private Intent go; 
 	private String s_id;
@@ -32,6 +39,9 @@ public class ImageActivity_holder extends Activity implements Imageinterface,Asy
 	private boolean flag=false;
 	private ProgressBar pb;
 	private Imagefragment im;
+	public FileOutputStream  fos;
+	private Bitmap bitmap;
+	private String ss_id;
 	@Override
 	protected void onCreate(Bundle b) {
 		super.onCreate(b);
@@ -104,7 +114,7 @@ public class ImageActivity_holder extends Activity implements Imageinterface,Asy
 		Imagefragment im = (Imagefragment) getFragmentManager().findFragmentByTag("Image");
 		im.setImage(output);
 		pb.setVisibility(View.INVISIBLE);
-		
+		Toast.makeText(this, "Image saved", Toast.LENGTH_SHORT).show();
 		
 	}
 
@@ -114,7 +124,7 @@ public class ImageActivity_holder extends Activity implements Imageinterface,Asy
 		
 		if(pos>=in.size())
 		{
-			Toast.makeText(this, "you reached position 0 ", Toast.LENGTH_LONG);
+			Toast.makeText(this, "you reached position 0 ", Toast.LENGTH_SHORT).show();;
 		}
 		else
 		{
@@ -136,7 +146,7 @@ public class ImageActivity_holder extends Activity implements Imageinterface,Asy
 		
 		if(pos<=0)
 		{
-			Toast.makeText(this, "You reached position last", Toast.LENGTH_LONG);
+			Toast.makeText(this, "You reached position last", Toast.LENGTH_SHORT).show();
 		}
 		else
 		{
@@ -154,25 +164,42 @@ public class ImageActivity_holder extends Activity implements Imageinterface,Asy
 	
 	
 	public void download(String str_id)
-	{
-		pb.setVisibility(View.VISIBLE);
-		 ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-	        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-	        if (networkInfo != null && networkInfo.isConnected()) {
-	        	String url = "http://bismarck.sdsu.edu/photoserver/photo/" + str_id;
-	        	System.out.println(url);
-	        	Imagedownloader usl = new Imagedownloader();
-	        	usl.delegate=this;
-	        	usl.execute(url);
-	 
-	            Log.i("imholder","success");
-	        } else {
-	           Log.i("ImageFragment","Fail");
-	        }
+	{	
+		ss_id=str_id;
+		imagereader ima = new imagereader();
+		ima.del=this;
+		ima.execute(str_id);
 	}
 
-
-
+	@Override
+	public void processFinish_reader(Bitmap output) {
+		
+		if(output!=null)
+		{
+			image=output;
+			Imagefragment im = (Imagefragment) getFragmentManager().findFragmentByTag("Image");
+			im.setImage(output);
+			pb.setVisibility(View.INVISIBLE);
+		}
+		else
+		{
+			pb.setVisibility(View.VISIBLE);
+			 ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		        if (networkInfo != null && networkInfo.isConnected()) {
+		        	Imagedownloader usl = new Imagedownloader();
+		        	usl.delegate=this;
+		        	usl.execute(ss_id);
+		 
+		            Log.i("imholder","success");
+		        } else {
+		           
+		        	Toast.makeText(this, "Information not available on database", Toast.LENGTH_SHORT).show();
+		        	pb.setVisibility(View.INVISIBLE);
+		        }
+		}
+		
+	}
 	
 
 }

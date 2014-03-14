@@ -1,5 +1,9 @@
 package com.example.server;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -14,13 +18,15 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 public class Imagedownloader extends AsyncTask<String, Integer, Bitmap> {
 	
 	public AsyncResponse_image delegate=null;
 	//private ProgressBar pb;
 	private int progress;
-	
+	private String id;
+	private FileOutputStream fos;
 	
 	
 	@Override
@@ -57,10 +63,12 @@ public class Imagedownloader extends AsyncTask<String, Integer, Bitmap> {
 	    super.onProgressUpdate(values);
 	}
 	
-	public Bitmap downloadBitmap(String myurl) throws IOException
+	public Bitmap downloadBitmap(String str_id) throws IOException
 	{
 		InputStream is = null;
 		try {
+			id = str_id;
+			String myurl = "http://bismarck.sdsu.edu/photoserver/photo/" + str_id;
 	        URL url = new URL(myurl);
 	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	        conn.setReadTimeout(10000 /* milliseconds */);
@@ -98,8 +106,42 @@ public class Imagedownloader extends AsyncTask<String, Integer, Bitmap> {
        else
        {
     	   delegate.processFinish_image(result);
+    	   storeImage(result);
        }
     }
+	 
+	 public void storeImage(Bitmap bitmap)
+		{
+			
+			String filename = id+".jpg";
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bytes);
+			File wallpaperDirectory = new File("/sdcard/Proj2/");
+			wallpaperDirectory.mkdirs();
+			File file = new File(wallpaperDirectory,filename);
+		    try {
+		        file.createNewFile();
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		        System.out.println("exception 1");
+		    }
+		    
+		    try {
+		       fos = new FileOutputStream(file);
+		    } catch (FileNotFoundException e) {
+		        e.printStackTrace();
+		        System.out.println("exception 2");
+		    }
+		    
+		    try {
+		        
+		    	fos.write(bytes.toByteArray());
+		        fos.close();
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		    }
+		}
+
 	
 	
 
